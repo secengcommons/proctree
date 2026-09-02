@@ -1,0 +1,74 @@
+name: "Platforms: Virtual"
+
+on:
+  workflow_call:
+  schedule:
+    - cron: '0 15 * * 0'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: platforms-virtual-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GOTOOLCHAIN: auto
+  GOWORK: off
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: FreeBSD 13.5 x64, os: freebsd, version: '13.5', architecture: x86-64, goos: freebsd, goarch: amd64}
+          - {name: FreeBSD 14.4 x64, os: freebsd, version: '14.4', architecture: x86-64, goos: freebsd, goarch: amd64}
+          - {name: FreeBSD 15.1 x64, os: freebsd, version: '15.1', architecture: x86-64, goos: freebsd, goarch: amd64, race: true}
+          - {name: FreeBSD 15.1 ARM64, os: freebsd, version: '15.1', architecture: arm64, goos: freebsd, goarch: arm64}
+          - {name: OpenBSD 7.7 x64, os: openbsd, version: '7.7', architecture: x86-64, goos: openbsd, goarch: amd64}
+          - {name: OpenBSD 7.8 x64, os: openbsd, version: '7.8', architecture: x86-64, goos: openbsd, goarch: amd64}
+          - {name: OpenBSD 7.9 x64, os: openbsd, version: '7.9', architecture: x86-64, goos: openbsd, goarch: amd64}
+          - {name: OpenBSD 7.9 ARM64, os: openbsd, version: '7.9', architecture: arm64, goos: openbsd, goarch: arm64}
+          - {name: NetBSD 9.4 x64, os: netbsd, version: '9.4', architecture: x86-64, goos: netbsd, goarch: amd64}
+          - {name: NetBSD 10.1 x64, os: netbsd, version: '10.1', architecture: x86-64, goos: netbsd, goarch: amd64}
+          - {name: NetBSD 11.0 x64, os: netbsd, version: '11.0', architecture: x86-64, goos: netbsd, goarch: amd64}
+          - {name: NetBSD 11.0 ARM64, os: netbsd, version: '11.0', architecture: arm64, goos: netbsd, goarch: arm64}
+          - {name: DragonFly BSD 6.4.2 x64, os: dragonflybsd, version: '6.4.2', architecture: x86-64, goos: dragonfly, goarch: amd64}
+          - {name: OmniOS r151058 x64, os: omnios, version: r151058, architecture: x86-64, goos: illumos, goarch: amd64}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Build VM Tests
+        run: bash ./.github/scripts/build-vm-tests.sh '${{ matrix.goos }}' '${{ matrix.goarch }}'
+      - name: Start Virtual Machine
+        uses: cross-platform-actions/action@24ef01df165c76df1ed2b9f9e9212e78dc2fc963 # v1.4.0
+        with:
+          operating_system: ${{ matrix.os }}
+          version: ${{ matrix.version }}
+          architecture: ${{ matrix.architecture }}
+          shell: bash
+          memory: 4G
+          cpu_count: 2
+      - name: Test Virtual Machine
+        shell: cpa.sh {0} --sync-files runner-to-vm
+        run: bash ./.github/scripts/test-vm.sh
+      - name: Test FreeBSD Race Behaviour
+        if: matrix.race
+        shell: cpa.sh {0}
+        run: |
+          sudo env ASSUME_ALWAYS_YES=yes pkg install go
+          go version
+          go test -race -count=1 -shuffle=on ./...

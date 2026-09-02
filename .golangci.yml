@@ -1,0 +1,44 @@
+version: "2"
+formatters:
+  enable:
+    - gofmt
+linters:
+  settings:
+    cyclop:
+      max-complexity: 12
+      package-average: 0.0
+    errcheck:
+      check-blank: true
+      check-type-assertions: true
+    misspell:
+      mode: restricted
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  default: none
+  enable:
+    - govet
+    - staticcheck
+    - unused
+    - errcheck
+    - ineffassign
+    - asciicheck
+    - bidichk
+    - cyclop
+    - durationcheck
+    - errorlint
+    - exhaustive
+    - gochecksumtype
+    - godox
+    - gosec
+    - makezero
+    - misspell
+    - modernize
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - recvcheck
+    - unparam
+    - usetesting
