@@ -38,7 +38,7 @@ jobs:
       - name: Build Solaris Tests
         run: bash ./.github/scripts/build-vm-tests.sh solaris amd64
       - name: Test Solaris
-        uses: vmactions/solaris-vm@d30dd6c228c8661ade859e36ead7660b9a62efcc # v1
+        uses: vmactions/solaris-vm@96d8d976f9e67d82ec6c7e8ce9c1060731f9e21c # v1
         with:
           release: 11.4-gcc-14
           usesh: true
