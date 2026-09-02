@@ -1,0 +1,7 @@
+/coverage.out
+/coverage.html
+/tools/workflow/workflow-coverage.out
+/tools/workflow/workflow-command-coverage.out
+/bin/
+/.cache/
+/.tests/

@@ -1,0 +1,166 @@
+name: Core
+
+on:
+  workflow_call:
+  schedule:
+    - cron: '0 14 * * 0'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: core-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GOTOOLCHAIN: auto
+  GOWORK: off
+
+jobs:
+  static:
+    name: Static
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: |
+            tools/go.sum
+            tools/workflow/go.sum
+      - name: Resolve Tools
+        id: tools
+        shell: bash
+        run: bash ./.github/scripts/resolve-tools.sh "$GITHUB_OUTPUT"
+      - name: Test Verification Drivers
+        run: bash ./.github/scripts/test-verification.sh
+      - name: Verify Modules
+        shell: bash
+        run: |
+          go mod tidy -diff
+          go mod verify
+          go -C tools mod tidy -diff
+          go -C tools mod verify
+          go -C tools/workflow mod tidy -diff
+          go -C tools/workflow mod verify
+      - name: Verify Go Fix
+        shell: bash
+        run: |
+          if ! difference=$(go fix -diff ./...); then
+            printf '%s\n' "$difference"
+            exit 1
+          fi
+          [[ -z "$difference" ]] || { printf '%s\n' "$difference"; exit 1; }
+          if ! difference=$(go -C tools/workflow fix -diff ./...); then
+            printf '%s\n' "$difference"
+            exit 1
+          fi
+          [[ -z "$difference" ]] || { printf '%s\n' "$difference"; exit 1; }
+      - name: Verify Modernisation Controls
+        run: bash ./.github/scripts/check-modernisation.sh "${{ steps.tools.outputs.golangci }}"
+      - name: Verify Linter Configuration
+        run: ${{ steps.tools.outputs.golangci }} config verify
+      - name: Verify Formatting
+        run: bash ./.github/scripts/check-format.sh '${{ steps.tools.outputs.golangci }}'
+      - name: Vet Packages
+        shell: bash
+        run: |
+          go vet ./...
+          go -C tools/workflow vet ./...
+      - name: Lint Packages
+        shell: bash
+        run: |
+          "${{ steps.tools.outputs.golangci }}" run
+          (cd tools/workflow && "${{ steps.tools.outputs.golangci }}" run --config ../../.golangci.yml ./...)
+      - name: Scan Vulnerabilities
+        run: ${{ steps.tools.outputs.govulncheck }} ./...
+      - name: Scan Tool Vulnerabilities
+        shell: bash
+        run: |
+          cd tools
+          "${{ steps.tools.outputs.govulncheck }}" \
+            github.com/golangci/golangci-lint/v2/cmd/golangci-lint \
+            golang.org/x/vuln/cmd/govulncheck
+          cd workflow
+          "${{ steps.tools.outputs.govulncheck }}" \
+            ./... \
+            github.com/rhysd/actionlint/cmd/actionlint \
+            github.com/wasilibs/go-shellcheck/cmd/shellcheck
+      - name: Verify Shell Scripts
+        shell: bash
+        run: |
+          bash -n .github/scripts/*.sh
+          "${{ steps.tools.outputs.shellcheck }}" .github/scripts/*.sh
+      - name: Verify Workflows
+        shell: bash
+        run: |
+          bash ./.github/scripts/check-workflows.sh
+          "${{ steps.tools.outputs.actionlint }}" -shellcheck="${{ steps.tools.outputs.shellcheck }}"
+      - name: Build Packages
+        shell: bash
+        run: |
+          go build -trimpath ./...
+          go -C tools/workflow build -trimpath ./...
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Test Complete Coverage
+        shell: bash
+        run: |
+          go test -count=1 -shuffle=on -covermode=atomic -coverprofile=coverage.out ./...
+          go tool cover -func=coverage.out
+          awk -f .github/scripts/coverage.awk coverage.out
+      - name: Test Workflow Checker
+        shell: bash
+        run: |
+          temporary=$(mktemp -d "${RUNNER_TEMP}/proctree-workflow-coverage.XXXXXX")
+          case "$temporary" in
+            "${RUNNER_TEMP}"/proctree-workflow-coverage.*) ;;
+            *) printf 'Unsafe workflow coverage directory: %s\n' "$temporary" >&2; exit 1 ;;
+          esac
+          trap 'rm -rf -- "$temporary"' EXIT
+          mkdir -- "$temporary/executable"
+          go -C tools/workflow test -count=1 -shuffle=on -covermode=atomic -coverprofile="$temporary/unit.out" ./cmd/workflowpolicy
+          WORKFLOW_POLICY_COVERAGE_DIR="$temporary/executable" bash ./.github/scripts/check-workflows.sh
+          go -C tools/workflow tool covdata textfmt -i="$temporary/executable" -o "$temporary/executable.out"
+          { cat "$temporary/unit.out"; tail -n +2 "$temporary/executable.out"; } >tools/workflow/workflow-command-coverage.out
+          go -C tools/workflow tool cover -func=workflow-command-coverage.out
+          awk -f .github/scripts/coverage.awk tools/workflow/workflow-command-coverage.out
+          go -C tools/workflow test -count=1 -shuffle=on -covermode=atomic -coverprofile=workflow-coverage.out ./internal/...
+          go -C tools/workflow tool cover -func=workflow-coverage.out
+          awk -f .github/scripts/coverage.awk tools/workflow/workflow-coverage.out
+      - name: Test Coverage Checker
+        shell: bash
+        run: |
+          if printf 'mode: atomic\nprobe.go:1.1,1.2 1 0\n' | awk -f .github/scripts/coverage.awk; then
+            printf 'Coverage check accepted an uncovered statement\n' >&2
+            exit 1
+          fi
+          printf 'mode: atomic\nprobe.go:1.1,1.2 1 0\nprobe.go:1.1,1.2 1 1\n' | awk -f .github/scripts/coverage.awk
+      - name: Test Race Behaviour
+        shell: bash
+        run: |
+          go test -race -count=1 -shuffle=on ./...
+          go -C tools/workflow test -race -count=1 -shuffle=on ./...
