@@ -1,6 +1,7 @@
 module github.com/secengcommons/proctree/tools/workflow
 
 go 1.26.0
+
 toolchain go1.26.6
 
 tool (
@@ -8,7 +9,7 @@ tool (
 	github.com/wasilibs/go-shellcheck/cmd/shellcheck
 )
 
-require go.yaml.in/yaml/v4 v4.0.0-rc.3
+require go.yaml.in/yaml/v4 v4.0.0-rc.6
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.10.0 // indirect
@@ -23,5 +24,5 @@ require (
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/wasilibs/go-shellcheck v0.11.1 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 )
