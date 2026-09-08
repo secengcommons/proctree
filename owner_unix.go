@@ -287,8 +287,7 @@ func watchdogWaitError(err error) error {
 	if err == nil {
 		return errors.New("process watchdog exited without terminating its group")
 	}
-	var exitErr *exec.ExitError
-	if errors.As(err, &exitErr) {
+	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok && exitErr != nil {
 		if status, statusOK := exitErr.Sys().(syscall.WaitStatus); statusOK && status.Signaled() && status.Signal() == syscall.SIGKILL {
 			return nil
 		}
