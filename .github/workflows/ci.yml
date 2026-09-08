@@ -17,58 +17,58 @@ jobs:
   verify:
     name: Verify
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/verify.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/verify.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   linux:
     name: Linux
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/linux.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/linux.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   windows:
     name: Windows
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/windows.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/windows.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   macos:
     name: macOS
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/macos.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/macos.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   fuzz:
     name: Fuzz
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/fuzz.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/fuzz.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   ports:
     name: Go ports
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/ports.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/ports.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   containers:
     name: Containers
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/containers.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/containers.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   alpine:
     name: Alpine Linux
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/alpine.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/alpine.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   bsd:
     name: BSD
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/bsd.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/bsd.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   illumos:
     name: illumos
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/illumos.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/illumos.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   solaris:
     name: Solaris
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/solaris.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/solaris.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   dependencies:
     name: Dependencies
     if: github.event_name == 'pull_request'
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/dependencies.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/dependencies.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   codeql:
     name: CodeQL
     permissions:
       contents: read
       security-events: write
-    uses: secengcommons/ci/.github/workflows/codeql.yml@dd8cf600b2928d81d535eb352fd6c6ac209f5d70 # v1.0.6
+    uses: secengcommons/ci/.github/workflows/codeql.yml@595e58f34a7e83011b20728c26790d6309380168 # v1.0.6
   required:
     name: Required
     if: ${{ always() }}
