@@ -292,8 +292,7 @@ func withCleanupDeadline(cause error, deadline time.Time) error {
 }
 
 func startCleanupDeadline(err error, timeout time.Duration) time.Time {
-	var bounded *boundedStartError
-	if errors.As(err, &bounded) {
+	if bounded, ok := errors.AsType[*boundedStartError](err); ok {
 		return bounded.deadline
 	}
 	return time.Now().Add(timeout)
