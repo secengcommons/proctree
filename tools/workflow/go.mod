@@ -1,7 +1,7 @@
 module github.com/secengcommons/proctree/tools/workflow
 
 go 1.26.0
-toolchain go1.26.6
+toolchain go1.27.1
 
 tool (
 	github.com/rhysd/actionlint/cmd/actionlint

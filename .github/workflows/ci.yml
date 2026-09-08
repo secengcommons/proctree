@@ -14,87 +14,71 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  core:
-    name: Core
-    uses: ./.github/workflows/core.yml
+  verify:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/verify.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  linux:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/linux.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  windows:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/windows.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  macos:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/macos.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  fuzz:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/fuzz.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  ports:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/ports.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  containers:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/containers.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  alpine:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/alpine.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  bsd:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/bsd.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  illumos:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/illumos.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  solaris:
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/solaris.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  dependencies:
+    if: github.event_name == 'pull_request'
+    permissions: {contents: read}
+    uses: secengcommons/ci/.github/workflows/dependencies.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
+  codeql:
     permissions:
-      contents: read
-
-  compatibility:
-    name: Compatibility
-    uses: ./.github/workflows/compatibility.yml
-    permissions:
-      contents: read
-
-  security:
-    name: Security
-    uses: ./.github/workflows/security.yml
-    permissions:
-      actions: read
       contents: read
       security-events: write
-
-  fuzzing:
-    name: Fuzzing
-    uses: ./.github/workflows/fuzzing.yml
-    permissions:
-      contents: read
-
-  ports:
-    name: Go Ports
-    uses: ./.github/workflows/ports.yml
-    permissions:
-      contents: read
-
-  platforms-containers:
-    name: "Platforms: Containers"
-    uses: ./.github/workflows/platforms-containers.yml
-    permissions:
-      contents: read
-
-  platforms-native:
-    name: "Platforms: Native"
-    uses: ./.github/workflows/platforms-native.yml
-    permissions:
-      contents: read
-
-  platforms-virtual:
-    name: "Platforms: Virtual"
-    uses: ./.github/workflows/platforms-virtual.yml
-    permissions:
-      contents: read
-
-  platforms-solaris:
-    name: "Platforms: Solaris"
-    uses: ./.github/workflows/platforms-solaris.yml
-    permissions:
-      contents: read
-
+    uses: secengcommons/ci/.github/workflows/codeql.yml@53ce8047adb206d19c75e2e49efcaf86932fa65b # v1.0.6
   required:
     name: Required
     if: ${{ always() }}
-    needs:
-      - core
-      - compatibility
-      - security
-      - fuzzing
-      - ports
-      - platforms-containers
-      - platforms-native
-      - platforms-virtual
-      - platforms-solaris
+    needs: [verify, linux, windows, macos, fuzz, ports, containers, alpine, bsd, illumos, solaris, dependencies, codeql]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
     steps:
-      - name: Check Groups
+      - name: Check jobs
         env:
+          EVENT: ${{ github.event_name }}
           RESULTS: ${{ toJSON(needs) }}
         shell: bash
         run: |
-          if jq -e 'length > 0 and all(.[]; .result == "success")' <<<"$RESULTS" >/dev/null; then
-            exit 0
-          fi
-          printf 'One or more CI groups failed\n' >&2
-          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<<"$RESULTS" >&2
-          exit 1
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ["RESULTS"])
+          expected = {name: "success" for name in results}
+          if os.environ["EVENT"] != "pull_request":
+              expected["dependencies"] = "skipped"
+          failed = {name: result["result"] for name, result in results.items() if result["result"] != expected[name]}
+          if failed:
+              for name in sorted(failed):
+                  print(f"{name}: {failed[name]}")
+              raise SystemExit(1)
+          PY
