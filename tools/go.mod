@@ -1,10 +1,11 @@
 module github.com/secengcommons/proctree/tools
 
 go 1.26.0
-toolchain go1.26.6
+toolchain go1.27.1
 
 tool (
 	github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+	github.com/secengcommons/verify/cmd/secverify
 	golang.org/x/vuln/cmd/govulncheck
 )
 
@@ -169,6 +170,9 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3 // indirect
 	github.com/sashamelentyev/interfacebloat v1.1.0 // indirect
 	github.com/sashamelentyev/usestdlibvars v1.29.0 // indirect
+	github.com/secengcommons/cli v1.0.0 // indirect
+	github.com/secengcommons/proctree v1.0.0 // indirect
+	github.com/secengcommons/verify v1.0.0-alpha2 // indirect
 	github.com/securego/gosec/v2 v2.28.0 // indirect
 	github.com/sirupsen/logrus v1.10.1 // indirect
 	github.com/sivchari/containedctx v1.0.3 // indirect
