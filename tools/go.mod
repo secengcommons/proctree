@@ -172,7 +172,7 @@ require (
 	github.com/sashamelentyev/usestdlibvars v1.29.0 // indirect
 	github.com/secengcommons/cli v1.0.0 // indirect
 	github.com/secengcommons/proctree v1.0.0 // indirect
-	github.com/secengcommons/verify v1.0.0-alpha2 // indirect
+	github.com/secengcommons/verify v1.0.0-alpha4 // indirect
 	github.com/securego/gosec/v2 v2.28.0 // indirect
 	github.com/sirupsen/logrus v1.10.1 // indirect
 	github.com/sivchari/containedctx v1.0.3 // indirect
