@@ -324,8 +324,7 @@ func runEscapedSupervisor() {
 	closeErr := lifetime.Close()
 	killErr := child.Process.Kill()
 	waitErr := child.Wait()
-	var exitErr *exec.ExitError
-	if errors.As(waitErr, &exitErr) {
+	if exitErr, ok := errors.AsType[*exec.ExitError](waitErr); ok && exitErr != nil {
 		waitErr = nil
 	}
 	if errors.Is(killErr, os.ErrProcessDone) {
