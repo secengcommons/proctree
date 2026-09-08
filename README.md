@@ -25,7 +25,7 @@ Commands use an absolute executable path and an argument vector without shell in
 go get github.com/secengcommons/proctree@v1.0.0
 ```
 
-Requires Go 1.25 or newer
+Requires Go 1.26 or newer
 
 ## Use
 ```go
