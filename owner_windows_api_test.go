@@ -124,8 +124,7 @@ func TestAtomicWindowsProcessFailures(t *testing.T) {
 				t.Fatalf("start failure = %v", err)
 			}
 			if test.name == "find" || test.name == "resume" {
-				var bounded *boundedStartError
-				if !errors.As(err, &bounded) {
+				if bounded, ok := errors.AsType[*boundedStartError](err); !ok || bounded == nil {
 					t.Fatalf("start failure has no cleanup deadline: %v", err)
 				}
 			}
