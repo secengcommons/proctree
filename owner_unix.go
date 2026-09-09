@@ -22,6 +22,7 @@ type unixAPI struct {
 	sleep      func(time.Duration)
 	timer      func(time.Duration) ownerTimer
 	ready      func(*os.File, time.Time) error
+	terminated func(int, time.Time) (bool, error)
 }
 
 type ownerTimer interface {
@@ -39,7 +40,8 @@ func systemUnixAPI() unixAPI {
 		pipe: os.Pipe, executable: os.Executable, start: func(command *exec.Cmd) error { return command.Start() },
 		close: func(file *os.File) error { return file.Close() }, kill: syscall.Kill,
 		now: time.Now, sleep: time.Sleep, timer: func(duration time.Duration) ownerTimer { return systemTimer{timer: time.NewTimer(duration)} },
-		ready: readWatchdogReady,
+		ready:      readWatchdogReady,
+		terminated: processGroupTerminated,
 	}
 }
 
@@ -205,6 +207,15 @@ func (owner *unixOwner) wait(deadline time.Time) error {
 		}
 		if err != nil && !errors.Is(err, syscall.EPERM) {
 			return errors.Join(stopErr, err)
+		}
+		if err == nil {
+			terminated, terminatedErr := owner.api.terminated(owner.pid, deadline)
+			if terminatedErr != nil {
+				return errors.Join(stopErr, terminatedErr)
+			}
+			if terminated {
+				return stopErr
+			}
 		}
 		if !owner.api.now().Before(deadline) {
 			return errors.Join(stopErr, err, errors.New("process group did not become empty"))
