@@ -167,7 +167,7 @@ func parseLinuxProcessStat(source []byte) (byte, int, bool) {
 		return 0, 0, false
 	}
 	group, err := strconv.Atoi(string(fields[linuxProcessGroupField]))
-	if err != nil || group <= 0 {
+	if err != nil || group < 0 {
 		return 0, 0, false
 	}
 	state := fields[linuxProcessStateField][0]

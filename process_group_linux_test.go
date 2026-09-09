@@ -98,7 +98,8 @@ func TestReadLinuxProcessStat(t *testing.T) {
 		{name: "fields", source: "12 (name) R 1", valid: false},
 		{name: "state", source: "12 (name) ? 1 41", valid: false},
 		{name: "group", source: "12 (name) R 1 invalid", valid: false},
-		{name: "zero group", source: "12 (name) R 1 0", valid: false},
+		{name: "zero group", source: "12 (name) R 1 0", valid: true},
+		{name: "negative group", source: "12 (name) R 1 -1", valid: false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			path := test.name + ".stat"
