@@ -539,10 +539,10 @@ github.com/sashamelentyev/usestdlibvars v1.29.0 h1:8J0MoRrw4/NAXtjQqTHrbW9NN+3iM
 github.com/sashamelentyev/usestdlibvars v1.29.0/go.mod h1:8PpnjHMk5VdeWlVb4wCdrB8PNbLqZ3wBZTZWkrpZZL8=
 github.com/secengcommons/cli v1.0.0 h1:gw5Azo7JS2FyKEw5hP/km2gTEHYqjMq+kGZ67N+U9jc=
 github.com/secengcommons/cli v1.0.0/go.mod h1:Zvkmis6cmgYnH6wBx9UUeITTYgJ+EooI0xioYIsmoB0=
-github.com/secengcommons/proctree v1.0.0 h1:T6VOfeZWGMg1u2HosQ4q26qFaRID3mpAR8GwJciGsXQ=
-github.com/secengcommons/proctree v1.0.0/go.mod h1:MJNaC9oFi1+BSDs6Phok1X8BV/pqjymh1aQql3M0w30=
-github.com/secengcommons/verify v1.0.0-alpha4 h1:85JPUAdDldtADBlc8P2UKJbwfCBno0/zUp/z1Pz/Z94=
-github.com/secengcommons/verify v1.0.0-alpha4/go.mod h1:eiomDBHrOqRJZ7H6StNu1BnaX62xMjjw5uexHRQONnE=
+github.com/secengcommons/proctree v1.1.0 h1:yGfBpAdORgG8OWKdlofT/G9jMDJSC42yON/b0maXNXc=
+github.com/secengcommons/proctree v1.1.0/go.mod h1:64mNFMhgsB1k63f6L8yRLG+5/sc8r6UHuSZIxvtPkbY=
+github.com/secengcommons/verify v1.0.0-alpha5 h1:TqYrXKs3AAYRiyG3Igl7DuUf3/R2RPzw4WUK/MXabCw=
+github.com/secengcommons/verify v1.0.0-alpha5/go.mod h1:WCsxUrxx0f+y3Km8iZt/Wiwkxz0oM+YLdbfq4Q0qojQ=
 github.com/securego/gosec/v2 v2.28.0 h1:ZsSdiDb0AtTpLFVol5z91gbMei9ZiLEPG/pZjZujp7c=
 github.com/securego/gosec/v2 v2.28.0/go.mod h1:lb4/9AHe+lJy/kjWmWRWWsEipvbwGKuxf+tY1Pmjdnk=
 github.com/sergi/go-diff v1.2.0 h1:XU+rvMAioB0UC3q1MFrIQy4Vo5/4VsRDQQXHsEya6xQ=
