@@ -8,20 +8,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"testing"
 	"time"
 )
-
-func TestSystemProcessGroupIsLive(t *testing.T) {
-	group, err := syscall.Getpgid(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if terminated, inspectErr := processGroupTerminated(group, linuxProcessDeadline()); inspectErr != nil || terminated {
-		t.Fatalf("current group = (%t, %v)", terminated, inspectErr)
-	}
-}
 
 func TestProcessGroupTerminated(t *testing.T) {
 	root := t.TempDir()
@@ -48,7 +37,7 @@ func TestProcessGroupInspectionFailures(t *testing.T) {
 		t.Fatal(err)
 	}
 	api = systemLinuxProcessGroupAPI()
-	api.openDirectory = func(string) (linuxProcessDirectory, error) { return nil, failure }
+	api.openDirectory = func(*os.Root) (linuxProcessDirectory, error) { return nil, failure }
 	if _, err := processGroupTerminatedWith(41, linuxProcessDeadline(), root, api); !errors.Is(err, failure) {
 		t.Fatalf("directory error = %v", err)
 	}
@@ -69,7 +58,7 @@ func TestProcessGroupInspectionFailures(t *testing.T) {
 		t.Fatal(closeErr)
 	}
 	api = systemLinuxProcessGroupAPI()
-	api.openDirectory = func(string) (linuxProcessDirectory, error) {
+	api.openDirectory = func(*os.Root) (linuxProcessDirectory, error) {
 		return &failedProcessDirectory{err: io.EOF, closeErr: failure}, nil
 	}
 	if _, err = processGroupTerminatedWith(41, linuxProcessDeadline(), root, api); !errors.Is(err, failure) {
@@ -153,7 +142,7 @@ func TestScanLinuxProcessGroupSkipsVanishedAndNonProcessEntries(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	directory, err := os.Open(root)
+	directory, err := opened.Open(".")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +183,7 @@ func TestLinuxProcessGroupInspectionHonoursDeadline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	directory, err := os.Open(root)
+	directory, err := opened.Open(".")
 	if err != nil {
 		t.Fatal(err)
 	}

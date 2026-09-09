@@ -25,7 +25,7 @@ type linuxProcessDirectory interface {
 
 type linuxProcessGroupAPI struct {
 	openRoot      func(string) (*os.Root, error)
-	openDirectory func(string) (linuxProcessDirectory, error)
+	openDirectory func(*os.Root) (linuxProcessDirectory, error)
 	openStat      func(*os.Root, string) (io.ReadCloser, error)
 	now           func() time.Time
 }
@@ -37,8 +37,8 @@ func processGroupTerminated(group int, deadline time.Time) (bool, error) {
 func systemLinuxProcessGroupAPI() linuxProcessGroupAPI {
 	return linuxProcessGroupAPI{
 		openRoot: os.OpenRoot,
-		openDirectory: func(path string) (linuxProcessDirectory, error) {
-			return os.Open(path)
+		openDirectory: func(root *os.Root) (linuxProcessDirectory, error) {
+			return root.Open(".")
 		},
 		openStat: func(root *os.Root, path string) (io.ReadCloser, error) {
 			return root.Open(path)
@@ -55,7 +55,7 @@ func processGroupTerminatedWith(group int, deadline time.Time, path string, api 
 	if err != nil {
 		return false, err
 	}
-	directory, err := api.openDirectory(path)
+	directory, err := api.openDirectory(root)
 	if err != nil {
 		return false, errors.Join(err, root.Close())
 	}
@@ -145,14 +145,14 @@ func readLinuxProcessStat(
 	read, readErr := io.ReadFull(file, buffer[:])
 	closeErr := file.Close()
 	if readErr == nil {
-		return 0, 0, errors.Join(errors.New("Linux process status exceeds its bound"), closeErr)
+		return 0, 0, errors.Join(errors.New("linux process status exceeds its bound"), closeErr)
 	}
 	if !errors.Is(readErr, io.ErrUnexpectedEOF) {
 		return 0, 0, errors.Join(readErr, closeErr)
 	}
 	state, group, valid := parseLinuxProcessStat(buffer[:read])
 	if !valid {
-		return 0, 0, errors.Join(errors.New("invalid Linux process status"), closeErr)
+		return 0, 0, errors.Join(errors.New("invalid linux process status"), closeErr)
 	}
 	return state, group, closeErr
 }

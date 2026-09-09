@@ -34,6 +34,16 @@ func TestUnixOwnerNativeTrees(t *testing.T) {
 	}
 }
 
+func TestCurrentUnixProcessGroupIsLive(t *testing.T) {
+	group, err := syscall.Getpgid(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if terminated, inspectErr := processGroupTerminated(group, time.Now().Add(outputSafetyTimeout)); inspectErr != nil || terminated {
+		t.Fatalf("current group = (%t, %v)", terminated, inspectErr)
+	}
+}
+
 func TestUnixOwnerDeadlineTerminatesTree(t *testing.T) {
 	command := helperCommand(t, "block-tree")
 	command.Timeout = nativeDeadlineTimeout
@@ -251,8 +261,8 @@ func parseUnixProcessIDs(t *testing.T, value []byte) []int {
 }
 
 func processAlive(processID int) bool {
-	err := syscall.Kill(processID, 0)
-	return err == nil || !errors.Is(err, syscall.ESRCH)
+	alive, err := testProcessAlive(processID)
+	return err != nil || alive
 }
 
 func stopTestProcess(processID int) error {
@@ -268,12 +278,12 @@ func stopTestProcess(processID int) error {
 
 func waitTestProcessExit(processID int, deadline time.Time) error {
 	for {
-		err := syscall.Kill(processID, 0)
-		if errors.Is(err, syscall.ESRCH) {
-			return nil
-		}
-		if err != nil && !errors.Is(err, syscall.EPERM) {
+		alive, err := testProcessAlive(processID)
+		if err != nil {
 			return err
+		}
+		if !alive {
+			return nil
 		}
 		if !time.Now().Before(deadline) {
 			return fmt.Errorf("process %d did not terminate", processID)
