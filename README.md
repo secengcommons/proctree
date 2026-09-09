@@ -22,7 +22,7 @@ Commands use an absolute executable path and an argument vector without shell in
 
 ## Install
 ```sh
-go get github.com/secengcommons/proctree@v1.0.0
+go get github.com/secengcommons/proctree@v1.1.0
 ```
 
 Requires Go 1.26 or newer
