@@ -34,16 +34,6 @@ func TestUnixOwnerNativeTrees(t *testing.T) {
 	}
 }
 
-func TestCurrentUnixProcessGroupIsLive(t *testing.T) {
-	group, err := syscall.Getpgid(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if terminated, inspectErr := processGroupTerminated(group, time.Now().Add(outputSafetyTimeout)); inspectErr != nil || terminated {
-		t.Fatalf("current group = (%t, %v)", terminated, inspectErr)
-	}
-}
-
 func TestUnixOwnerDeadlineTerminatesTree(t *testing.T) {
 	command := helperCommand(t, "block-tree")
 	command.Timeout = nativeDeadlineTimeout

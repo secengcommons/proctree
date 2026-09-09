@@ -8,9 +8,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 )
+
+func TestSystemProcessGroupIsLive(t *testing.T) {
+	group, err := syscall.Getpgid(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if terminated, inspectErr := processGroupTerminated(group, linuxProcessDeadline()); inspectErr != nil || terminated {
+		t.Fatalf("current group = (%t, %v)", terminated, inspectErr)
+	}
+}
 
 func TestProcessGroupTerminated(t *testing.T) {
 	root := t.TempDir()

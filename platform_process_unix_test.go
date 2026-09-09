@@ -5,7 +5,15 @@ package proctree
 import (
 	"errors"
 	"syscall"
+	"testing"
+	"time"
 )
+
+func TestUnixProcessGroupTerminationRemainsConservative(t *testing.T) {
+	if terminated, err := processGroupTerminated(1, time.Time{}); err != nil || terminated {
+		t.Fatalf("process group = (%t, %v)", terminated, err)
+	}
+}
 
 func testProcessAlive(processID int) (bool, error) {
 	err := syscall.Kill(processID, 0)
