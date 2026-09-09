@@ -284,16 +284,28 @@ func TestUnixOwnerTerminateAndWait(t *testing.T) {
 	}
 	slept := false
 	api.sleep = func(time.Duration) { slept = true }
+	api.terminated = func(int, time.Time) (bool, error) { return false, nil }
 	owner.api = api
 	if err := owner.wait(api.now().Add(time.Second)); err != nil || !slept {
 		t.Fatalf("eventual wait = (%v, %t)", err, slept)
 	}
 	api.kill = func(int, syscall.Signal) error { return nil }
+	api.terminated = func(int, time.Time) (bool, error) { return false, nil }
 	now := time.Unix(1, 0)
 	api.now = func() time.Time { now = now.Add(time.Second); return now }
 	owner.api = api
 	if err := owner.wait(now.Add(time.Nanosecond)); err == nil {
 		t.Fatal("wait deadline accepted")
+	}
+	api.terminated = func(int, time.Time) (bool, error) { return true, nil }
+	owner.api = api
+	if err := owner.wait(now.Add(time.Nanosecond)); err != nil {
+		t.Fatalf("terminated group error = %v", err)
+	}
+	api.terminated = func(int, time.Time) (bool, error) { return false, failure }
+	owner.api = api
+	if err := owner.wait(now.Add(time.Nanosecond)); !errors.Is(err, failure) {
+		t.Fatalf("termination inspection error = %v", err)
 	}
 }
 
