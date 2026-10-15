@@ -141,6 +141,20 @@ func TestReadLinuxProcessStat(t *testing.T) {
 	}
 }
 
+func TestLinuxTestProcessGoneClassifiesTerminalRaces(t *testing.T) {
+	for _, err := range []error{
+		&os.PathError{Op: "open", Path: "/proc/1/stat", Err: os.ErrNotExist},
+		&os.PathError{Op: "read", Path: "/proc/1/stat", Err: syscall.ESRCH},
+	} {
+		if !linuxTestProcessGone(err) {
+			t.Fatalf("terminal process error not classified: %v", err)
+		}
+	}
+	if linuxTestProcessGone(errors.New("failure")) {
+		t.Fatal("unrelated process error classified as terminal")
+	}
+}
+
 func TestScanLinuxProcessGroupSkipsVanishedAndNonProcessEntries(t *testing.T) {
 	root := t.TempDir()
 	if err := os.WriteFile(filepath.Join(root, "not-a-process"), nil, 0o600); err != nil {

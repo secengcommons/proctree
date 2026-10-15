@@ -26,11 +26,15 @@ func testProcessAlive(processID int) (bool, error) {
 		return root.Open(path)
 	})
 	rootCloseErr := root.Close()
-	if errors.Is(readErr, os.ErrNotExist) {
+	if linuxTestProcessGone(readErr) {
 		return false, rootCloseErr
 	}
 	if readErr != nil || rootCloseErr != nil {
 		return true, errors.Join(readErr, rootCloseErr)
 	}
 	return liveLinuxProcessState(state), nil
+}
+
+func linuxTestProcessGone(err error) bool {
+	return errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ESRCH)
 }
