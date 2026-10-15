@@ -17,58 +17,58 @@ jobs:
   verify:
     name: Verify
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/verify.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/verify.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   linux:
     name: Linux
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/linux.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/linux.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   windows:
     name: Windows
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/windows.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/windows.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   macos:
     name: macOS
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/macos.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/macos.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   fuzz:
     name: Fuzz
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/fuzz.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/fuzz.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   ports:
     name: Go ports
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/ports.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/ports.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   containers:
     name: Containers
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/containers.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/containers.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   alpine:
     name: Alpine Linux
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/alpine.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/alpine.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   bsd:
     name: BSD
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/bsd.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/bsd.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   illumos:
     name: illumos
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/illumos.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/illumos.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   solaris:
     name: Solaris
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/solaris.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/solaris.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   dependencies:
     name: Dependencies
     if: github.event_name == 'pull_request'
     permissions: {contents: read}
-    uses: secengcommons/ci/.github/workflows/dependencies.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/dependencies.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   codeql:
     name: CodeQL
     permissions:
       contents: read
       security-events: write
-    uses: secengcommons/ci/.github/workflows/codeql.yml@76c18728aad5ae2ba70cc3776bb328bd78f24bef # v1.0.6; exclude v1.0.7: reusable workflow files unchanged
+    uses: secengcommons/ci/.github/workflows/codeql.yml@7a51b38ffab12b7310504762af02dd7e74805656 # v1.0.8
   benchmark:
     name: Benchmark
     runs-on: ubuntu-24.04
